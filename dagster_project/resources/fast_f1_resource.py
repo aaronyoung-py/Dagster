@@ -1,10 +1,9 @@
 import pandas as pd
 from dagster import ConfigurableResource
 import fastf1 as ff1
-from fastf1.core import Laps
 from typing import Literal
-from fastf1.core import Session, DataNotLoadedError
-
+from fastf1.core import Session, Laps
+from fastf1.exceptions import DataNotLoadedError
 
 class FastF1Client:
 

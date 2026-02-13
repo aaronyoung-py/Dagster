@@ -2,7 +2,6 @@ import pandas
 import pandas as pd
 from dagster import asset, Output, MetadataValue, AssetExecutionContext
 import datetime
-from fastf1.plotting._constants import *
 
 
 @asset(required_resource_keys={"jolpi_api"})
@@ -44,7 +43,8 @@ def get_constructor_colour_data(context: AssetExecutionContext):
         'alphatauri': '2b4562',
         'alpine': 'ff87bc',
         'aston_martin': '00665f',
-        'rb': '6692ff'
+        'rb': '6692ff',
+        'cadillac': '#444444'
     }
 
     df = pd.DataFrame({'CONSTRUCTOR_ID': data.keys(),
