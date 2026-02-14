@@ -240,7 +240,7 @@ def weather_historical_cleanup(context: AssetExecutionContext, get_weather_histo
 
 
 @asset(io_manager_key='sql_io_manager',
-       key_prefix=['WEATHER', 'WEATHER_HISTORIC', 'replace'])
+       key_prefix=['WEATHER', 'WEATHER_HISTORIC', 'cleanup'])
 def full_weather_historic_to_sql(context, get_full_weather_historic_data: pd.DataFrame):
     load_date = datetime.today()
     df = get_full_weather_historic_data
