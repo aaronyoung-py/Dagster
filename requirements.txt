@@ -1,5 +1,6 @@
 dagster
 dagster-webserver
+dagster-postgres
 pandas
 discord.py
 fastf1
