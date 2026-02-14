@@ -8,15 +8,26 @@ retention:
       success: -1
 
 run_queue:
-  max_concurrent_runs: 4
+  max_concurrent_runs: 2
 
 sensors:
   use_threads: true
-  num_workers: 4
+  num_workers: 2
 
 schedules:
   use_threads: true
-  num_workers: 4
+  num_workers: 2
+
+storage:
+  postgres:
+    postgres_db:
+      username:
+        env: POSTGRES_USER
+      password:
+        env: POSTGRES_PASSWORD
+      hostname: localhost
+      db_name: dagster_logs
+      port: 5432
 
 local_artifact_storage:
   module: dagster.core.storage.root
