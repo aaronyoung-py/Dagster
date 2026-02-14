@@ -102,7 +102,7 @@ def get_full_weather_historic_data(context, get_calender_locations_sql_historic:
 
         weather_data = pd.concat((weather_data, hourly_dataframe_archive))
 
-        sleep(1)
+        sleep(15)
 
     weather_data = weather_data[['FCST_LOCATION',
                                  'utc_datetime',
