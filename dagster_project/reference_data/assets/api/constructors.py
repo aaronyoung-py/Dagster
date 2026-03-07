@@ -44,7 +44,8 @@ def get_constructor_colour_data(context: AssetExecutionContext):
         'alpine': 'ff87bc',
         'aston_martin': '00665f',
         'rb': '6692ff',
-        'cadillac': '444444'
+        'cadillac': '444444',
+        'audi': '00e700'
     }
 
     df = pd.DataFrame({'CONSTRUCTOR_ID': data.keys(),
