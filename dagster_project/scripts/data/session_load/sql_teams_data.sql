@@ -9,6 +9,8 @@ SELECT
             THEN 'Racing Bulls'
         WHEN NAME = 'Alpine F1 Team'
             THEN 'Alpine'
+        WHEN NAME = 'Cadillac F1 Team'
+            THEN 'Cadillac'
         ELSE NAME
     END AS NAME
 FROM REFERENCE.DIM_CONSTRUCTOR
