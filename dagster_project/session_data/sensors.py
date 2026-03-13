@@ -159,7 +159,7 @@ def qualifying_data_load_sensor(context: SensorEvaluationContext):
                                                                        round_number=next_event_df['ROUND_NUMBER'],
                                                                        sprint=sprint).copy()
 
-            drivers = pd.unique(api_data['DriverId'])
+            drivers = pd.unique(api_data['Abbreviation'])
             if len(drivers) <= 1:
                 return SkipReason("Session data is not available as there is no drivers in the data")
             if len(api_data[~api_data['Q1'].isnull()]) == 0:
