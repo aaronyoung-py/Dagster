@@ -18,26 +18,19 @@ schedules:
   use_threads: true
   num_workers: 2
 
-run_storage:
-  module: dagster.core.storage.runs
-  class: SqliteRunStorage
-  config:
-    base_dir:
-      env: DAGSTER_LOCAL_ARTIFACT_STORAGE_DIR
-
-event_log_storage:
-  module: dagster.core.storage.event_log
-  class: SqliteEventLogStorage
-  config:
-    base_dir:
-      env: DAGSTER_LOCAL_ARTIFACT_STORAGE_DIR
-
-schedule_storage:
-  module: dagster.core.storage.schedules
-  class: SqliteScheduleStorage
-  config:
-    base_dir:
-      env: DAGSTER_LOCAL_ARTIFACT_STORAGE_DIR
+storage:
+  postgres:
+    postgres_db:
+      username:
+        env: POSTGRES_USER
+      password:
+        env: POSTGRES_PASSWORD
+      hostname:
+        env: POSTGRES_HOST
+      db_name:
+        env: POSTGRES_DB
+      port:
+        env: POSTGRES_PORT
 
 local_artifact_storage:
   module: dagster.core.storage.root
