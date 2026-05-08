@@ -56,7 +56,7 @@ def database_backup(context: AssetExecutionContext,
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     backup_file = f"{backup_dir}{type}_mysql_{timestamp}.sql"
 
-    dump_command = f'mysqldump -h {server} -P {port} -u {user} --password={password} --all-databases --no-tablespaces --result-file "{backup_file}"'
+    dump_command = f'mysqldump -h"{server}" -P{port} -u"{user}" -p"{password}" --all-databases --no-tablespaces > "{backup_file}"'
 
     context.log.info('Creating Backup')
     subprocess.run(dump_command, shell=True)
