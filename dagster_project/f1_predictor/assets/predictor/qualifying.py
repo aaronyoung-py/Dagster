@@ -144,8 +144,8 @@ def create_qualifying_prediction_img(context: AssetExecutionContext,
 
     save_loc = data_loc + f'{session_info["year"]}/' + file_name
 
-    # Sort by predicted time in descending order (fastest at top)
-    output_df = output_df.sort_values('Predicted Time')
+    # Sort by predicted time from smallest to largest
+    output_df = output_df.sort_values('Predicted Time', ascending=False)
 
     fig, ax = plt.subplots(figsize=(10, 7.5))
 
