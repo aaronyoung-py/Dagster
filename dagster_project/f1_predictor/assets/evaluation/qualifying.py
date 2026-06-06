@@ -5,9 +5,10 @@ import pandas as pd
 from utils.file_utils import FileUtils
 import plotly.graph_objects as go
 import os
+import plotly.io as pio
 
 data_loc = os.getenv('DATA_STORE_LOC')
-
+pio.get_chrome()
 
 @asset(required_resource_keys={"mysql"})
 def get_qualifying_evaluation_data(context: AssetExecutionContext,
