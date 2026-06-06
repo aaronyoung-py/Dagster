@@ -60,7 +60,7 @@ def create_qualifying_position_evaluation_img(context: AssetExecutionContext,
                    fontsize=8)
 
     # Add diagonal reference line
-    ax.plot([0, 20], [0, 20], 'grey', linestyle='--', linewidth=1, alpha=0.25, zorder=0)
+    ax.plot([0, 22], [0, 22], 'grey', linestyle='--', linewidth=1, alpha=0.25, zorder=0)
 
     # Styling
     ax.set_xlabel('Predicted Position', fontsize=16, color='#15151E')
