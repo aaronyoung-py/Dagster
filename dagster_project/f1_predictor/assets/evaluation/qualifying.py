@@ -3,12 +3,10 @@ from utils.file_utils import FileUtils
 from dagster import asset, Output, AssetExecutionContext, MetadataValue
 import pandas as pd
 from utils.file_utils import FileUtils
-import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 import os
-import plotly.io as pio
 
 data_loc = os.getenv('DATA_STORE_LOC')
-pio.get_chrome()
 
 @asset(required_resource_keys={"mysql"})
 def get_qualifying_evaluation_data(context: AssetExecutionContext,
@@ -41,67 +39,50 @@ def create_qualifying_position_evaluation_img(context: AssetExecutionContext,
     file_name = f'{session_info["round_number"]}_laptime_eval.png'
     save_loc = data_loc + f'{session_info["year"]}/' + file_name
 
-    fig = go.Figure(data=[go.Scatter(x=df['PREDICTED_POSITION'],
-                                     y=df['ACTUAL_POSITION'],
-                                     mode='markers+text',
-                                     text=df['DRIVER'],
-                                     textposition="top center",
-                                     marker=dict(color=df['CONSTRUCTOR_COLOUR'])
-                                     )
-                          ],
-                    layout=dict(
-                        title=dict(text="<B>F1 Qualifying Prediction Accuracy<B>",
-                                   font=dict(color="#15151E",
-                                             size=20),
-                                   subtitle=dict(text=f"Round {session_info['round_number']}",
-                                                 font=dict(color="#15151E",
-                                                           size=16))),
-                        xaxis=dict(title=dict(text='Predicted Posistion',
-                                              font=dict(color="#15151E",
-                                                        size=16)),
-                                   zeroline=False,
-                                   showgrid=False,
-                                   mirror=True,
-                                   ticks='outside',
-                                   showline=True,
-                                   linecolor="#15151E"
-                                   ),
-                        yaxis=dict(
-                            title=dict(text='Actual Posistion',
-                                       font=dict(color="#15151E",
-                                                 size=16)),
-                            showgrid=False,
-                            zeroline=False,
-                            mirror=True,
-                            ticks='outside',
-                            showline=True,
-                            linecolor="#15151E",
-                            autorange="reversed"
-                        ),
-                        width=750,
-                        height=700,
-                        margin=dict(l=100,
-                                    r=100,
-                                    b=100,
-                                    t=100),
-                        plot_bgcolor='#f7f7f7'
-                    )
-                    )
+    fig, ax = plt.subplots(figsize=(7.5, 7))
 
-    fig.add_shape(type="line",
-                  x0=0,
-                  y0=0,
-                  x1=20,
-                  y1=20,
-                  opacity=0.25,
-                  layer='below',
-                  line=dict(color="grey",
-                            width=2,
-                            dash="dot"
-                            )
-                  )
+    # Create scatter plot with colors from CONSTRUCTOR_COLOUR
+    scatter = ax.scatter(df['PREDICTED_POSITION'],
+                         df['ACTUAL_POSITION'],
+                         c=df['CONSTRUCTOR_COLOUR'],
+                         s=100,
+                         alpha=0.7,
+                         edgecolors='black',
+                         linewidth=0.5)
 
-    fig.write_image(save_loc)
+    # Add driver text labels
+    for idx, row in df.iterrows():
+        ax.annotate(row['DRIVER'],
+                   (row['PREDICTED_POSITION'], row['ACTUAL_POSITION']),
+                   textcoords="offset points",
+                   xytext=(0, 10),
+                   ha='center',
+                   fontsize=8)
+
+    # Add diagonal reference line
+    ax.plot([0, 20], [0, 20], 'grey', linestyle='--', linewidth=1, alpha=0.25, zorder=0)
+
+    # Styling
+    ax.set_xlabel('Predicted Position', fontsize=16, color='#15151E')
+    ax.set_ylabel('Actual Position', fontsize=16, color='#15151E')
+    ax.set_title('F1 Qualifying Prediction Accuracy\n' + f"Round {session_info['round_number']}",
+                 fontsize=20, color='#15151E', fontweight='bold')
+
+    # Invert y-axis to match original (reversed range)
+    ax.invert_yaxis()
+
+    # Styling
+    ax.set_facecolor('#f7f7f7')
+    fig.patch.set_facecolor('white')
+    ax.spines['top'].set_visible(True)
+    ax.spines['right'].set_visible(True)
+    ax.spines['left'].set_color('#15151E')
+    ax.spines['bottom'].set_color('#15151E')
+    ax.tick_params(colors='#15151E')
+
+    plt.tight_layout()
+    plt.savefig(save_loc, dpi=100, bbox_inches='tight')
+    plt.close()
 
     return Output(value=save_loc,
                   metadata={
@@ -121,47 +102,45 @@ def create_qualifying_laptime_evaluation_img(context: AssetExecutionContext,
 
     df.sort_values(by='ABS_LAPTIME_DIFFRENCE', inplace=True)
 
-    fig = go.Figure(data=[go.Bar(x=df['DRIVER'],
-                                 y=df['LAPTIME_DIFFRENCE'],
-                                 texttemplate="%{x}<br>%{y}s",
-                                 textposition="outside",
-                                 marker_color=df['CONSTRUCTOR_COLOUR'])],
-                    layout=dict(title=dict(text="<B>F1 Qualifying Laptime Prediction Accuracy<B>",
-                                           font=dict(color="#15151E", size=20),
-                                           subtitle=dict(text=f"Round {session_info['round_number']}",
-                                                         font=dict(color="#15151E",
-                                                                   size=16))),
-                                xaxis=dict(title=dict(text=''),
-                                           showgrid=False,
-                                           mirror=True,
-                                           ticks='',
-                                           showticklabels=False,
-                                           showline=True,
-                                           linecolor="#15151E"
-                                           ),
-                                yaxis=dict(
-                                    title=dict(text=''),
-                                    showgrid=False,
-                                    mirror=True,
-                                    ticks='',
-                                    showticklabels=False,
-                                    showline=True,
-                                    linecolor="#15151E",
-                                    range=[df['LAPTIME_DIFFRENCE'].min() - 0.5,
-                                           df['LAPTIME_DIFFRENCE'].max() + 0.5]
-                                ),
-                                width=1000,
-                                height=750,
-                                margin=dict(l=60,
-                                            r=60,
-                                            b=100,
-                                            t=100,
-                                            pad=10),
-                                plot_bgcolor='#f7f7f7'
-                                )
-                    )
+    fig, ax = plt.subplots(figsize=(10, 7.5))
 
-    fig.write_image(save_loc, scale=6)
+    # Create bar chart with colors from CONSTRUCTOR_COLOUR
+    bars = ax.bar(range(len(df)), df['LAPTIME_DIFFRENCE'],
+                  color=df['CONSTRUCTOR_COLOUR'],
+                  edgecolor='black',
+                  linewidth=0.5)
+
+    # Add value labels on bars
+    for i, (idx, row) in enumerate(df.iterrows()):
+        height = row['LAPTIME_DIFFRENCE']
+        ax.text(i, height + 0.1, f"{row['DRIVER']}\n{height:.2f}s",
+               ha='center', va='bottom', fontsize=9)
+
+    # Styling
+    ax.set_ylabel('Laptime Difference (s)', fontsize=16, color='#15151E')
+    ax.set_title('F1 Qualifying Laptime Prediction Accuracy\n' + f"Round {session_info['round_number']}",
+                 fontsize=20, color='#15151E', fontweight='bold')
+
+    # Remove x-axis labels and ticks
+    ax.set_xticks([])
+
+    # Set y-axis range
+    y_min = df['LAPTIME_DIFFRENCE'].min() - 0.5
+    y_max = df['LAPTIME_DIFFRENCE'].max() + 0.5
+    ax.set_ylim(y_min, y_max)
+
+    # Styling
+    ax.set_facecolor('#f7f7f7')
+    fig.patch.set_facecolor('white')
+    ax.spines['top'].set_visible(True)
+    ax.spines['right'].set_visible(True)
+    ax.spines['left'].set_color('#15151E')
+    ax.spines['bottom'].set_color('#15151E')
+    ax.tick_params(colors='#15151E')
+
+    plt.tight_layout()
+    plt.savefig(save_loc, dpi=600, bbox_inches='tight')
+    plt.close()
 
     return Output(value=save_loc,
                   metadata={

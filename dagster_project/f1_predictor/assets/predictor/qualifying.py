@@ -5,7 +5,7 @@ from dagster import asset, Output, MetadataValue, AssetExecutionContext
 from utils.discord_utils import DiscordUtils
 from sklearn.linear_model import LinearRegression
 from utils.file_utils import FileUtils
-import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 
 data_loc = os.getenv('DATA_STORE_LOC')
 
@@ -144,51 +144,48 @@ def create_qualifying_prediction_img(context: AssetExecutionContext,
 
     save_loc = data_loc + f'{session_info["year"]}/' + file_name
 
-    fig = go.Figure(data=[go.Bar(y=output_df['Driver'],
-                                 x=output_df['Predicted Time'],
-                                 texttemplate="%{y} - %{x}s",
-                                 textposition="outside",
-                                 marker_color=output_df['CONSTRUCTOR_COLOUR'],
-                                 orientation='h')],
-                    layout=dict(title=dict(text="<B>F1 Qualifying Laptime Prediction<B>",
-                                           font=dict(color="#15151E", size=24),
-                                           subtitle=dict(text=f"Round {session_info['round_number']}",
-                                                         font=dict(color="#15151E",
-                                                                   size=20))),
-                                yaxis=dict(title=dict(text=''),
-                                           showgrid=False,
-                                           mirror=True,
-                                           ticks='',
-                                           showticklabels=False,
-                                           showline=True,
-                                           linecolor="#15151E",
-                                           categoryorder='total descending'
-                                           ),
-                                xaxis=dict(
-                                    title=dict(text=''),
-                                    showgrid=False,
-                                    mirror=True,
-                                    ticks='',
-                                    showticklabels=False,
-                                    showline=True,
-                                    linecolor="#15151E",
-                                    range=[output_df['Predicted Time'].min() - 0.25,
-                                           output_df['Predicted Time'].max() + 1.5]
-                                ),
-                                width=1000,
-                                height=750,
-                                margin=dict(l=60,
-                                            r=60,
-                                            b=60,
-                                            t=125,
-                                            pad=10),
-                                plot_bgcolor='#f7f7f7'
-                                )
-                    )
+    # Sort by predicted time in descending order (fastest at top)
+    output_df = output_df.sort_values('Predicted Time')
 
-    fig.update_layout(uniformtext_minsize=10)
+    fig, ax = plt.subplots(figsize=(10, 7.5))
 
-    fig.write_image(save_loc)
+    # Create horizontal bar chart
+    bars = ax.barh(range(len(output_df)), output_df['Predicted Time'],
+                   color=output_df['CONSTRUCTOR_COLOUR'],
+                   edgecolor='black',
+                   linewidth=0.5)
+
+    # Add value labels on bars
+    for i, (idx, row) in enumerate(output_df.iterrows()):
+        time = row['Predicted Time']
+        ax.text(time + 0.05, i, f" {row['Driver']} - {time}s",
+               va='center', fontsize=10)
+
+    # Styling
+    ax.set_xlabel('Predicted Time (s)', fontsize=20, color='#15151E')
+    ax.set_title('F1 Qualifying Laptime Prediction\n' + f"Round {session_info['round_number']}",
+                fontsize=24, color='#15151E', fontweight='bold')
+
+    # Remove y-axis labels and ticks
+    ax.set_yticks([])
+
+    # Set x-axis range
+    x_min = output_df['Predicted Time'].min() - 0.25
+    x_max = output_df['Predicted Time'].max() + 1.5
+    ax.set_xlim(x_min, x_max)
+
+    # Styling
+    ax.set_facecolor('#f7f7f7')
+    fig.patch.set_facecolor('white')
+    ax.spines['top'].set_visible(True)
+    ax.spines['right'].set_visible(True)
+    ax.spines['left'].set_color('#15151E')
+    ax.spines['bottom'].set_color('#15151E')
+    ax.tick_params(colors='#15151E')
+
+    plt.tight_layout()
+    plt.savefig(save_loc, dpi=100, bbox_inches='tight')
+    plt.close()
 
     return Output(value=save_loc,
                   metadata={
