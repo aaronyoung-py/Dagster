@@ -6,8 +6,8 @@ from dagster import asset, Output, MetadataValue, multi_asset, AssetOut, AssetEx
 import time
 
 data_loc = os.getenv('DATA_STORE_LOC')
-user = os.getenv('SQL_USER')
-password = os.getenv('SQL_PASSWORD')
+user = os.getenv('SQL_BACKUP_USER')
+password = os.getenv('SQL_BACKUP_PASSWORD')
 database = os.getenv('DATABASE')
 port = os.getenv('SQL_PORT')
 server = os.getenv('SQL_SERVER')
