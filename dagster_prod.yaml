@@ -8,7 +8,7 @@ retention:
       success: -1
 
 run_queue:
-  max_concurrent_runs: 2
+  max_concurrent_runs: 4
 
 sensors:
   use_threads: true
